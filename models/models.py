@@ -9,6 +9,18 @@ class ResPartner(models.Model):
     invoice_payment_term_id = fields.Many2one('account.payment.term', string='Payment Terms',
                                               check_company=True)
 
+    @api.model
+    def _name_search(self, name, args=None, operator="ilike", limit=100, name_get_uid=None):
+        args = args or []
+        domain = []
+
+        restrict = self.env.context.get('restrict_types')
+        if restrict == 'company':
+            domain += ['&', ('is_company', '=', True),
+                       ("customer_rank", ">", 0)]
+
+        return self._search(domain+args, limit=limit, access_rights_uid=name_get_uid)
+
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
@@ -25,7 +37,8 @@ class ProductProduct(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    family_name = fields.Char(string='Family', related='product_id.categ_id.name', readonly=True)
+    family_name = fields.Char(
+        string='Family', related='product_id.categ_id.name', readonly=True)
     activity_type_name = fields.Char(string='Activity Type', related='product_id.categ_id.parent_id.name',
                                      readonly=True)
     designation_name = fields.Char(string='Designation')
@@ -38,7 +51,6 @@ class AccountMoveLine(models.Model):
 
     designation_name = fields.Char(string='Designation')
     unity = fields.Char(string='Unity')
-
 
 
 class SaleOrderLine(models.Model):
@@ -60,16 +72,16 @@ class SaleOrder(models.Model):
     client_reference = fields.Char("Reference Client")
     sale_order_date = fields.Date(string='Date de la commande')
 
-    @api.model 
+    @api.model
     def create(self, vals):
         for line in vals['order_line']:
-            product = self.env['product.product'].search([('id', '=', int(line[2]["product_id"]))])
+            product = self.env['product.product'].search(
+                [('id', '=', int(line[2]["product_id"]))])
             product.write({
                 'description_pickingout': line[2]["name"]
             })
-        res = super(SaleOrder, self).create(vals) 
+        res = super(SaleOrder, self).create(vals)
         return res
-
 
 
 class ResPartner(models.Model):
@@ -88,23 +100,26 @@ class ResPartner(models.Model):
                 partner.ref = ''
 
 
-
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
     declaration_impots = fields.Boolean('A declarer ?', default=False)
     declaration_date = fields.Datetime(string='Date declaration')
     depot_date = fields.Datetime(string='Date depot')
-    sale_order_date = fields.Date(string='Date commande', compute='_compute_sale_order_date')
-    reception_number = fields.Char("Numero Reception", default="RECEPT", required="True")
+    sale_order_date = fields.Date(
+        string='Date commande', compute='_compute_sale_order_date')
+    reception_number = fields.Char(
+        "Numero Reception", default="RECEPT", required="True")
     acompte = fields.Boolean("Acompte ?")
     acompte_value = fields.Integer("Montant Acompte (FCFA)")
 
     def _compute_sale_order_date(self):
         for account_move in self:
-            sale_order_id = account_move.invoice_line_ids.mapped('sale_line_ids').order_id.id
+            sale_order_id = account_move.invoice_line_ids.mapped(
+                'sale_line_ids').order_id.id
             if sale_order_id:
-                sale_order = self.env['sale.order'].search([('id', '=', sale_order_id)], limit=1)
+                sale_order = self.env['sale.order'].search(
+                    [('id', '=', sale_order_id)], limit=1)
                 account_move.sale_order_date = sale_order.sale_order_date
             else:
                 account_move.sale_order_date = ""
@@ -112,7 +127,6 @@ class AccountMove(models.Model):
 
 class StockMoveLine(models.Model):
     _inherit = "stock.move.line"
-
 
     def _get_aggregated_product_quantities(self, **kwargs):
         """ Returns a dictionary of products (key = id+name+description+uom) and corresponding values of interest.
@@ -131,7 +145,8 @@ class StockMoveLine(models.Model):
             if description == name or description == move_line.product_id.name:
                 description = False
             uom = move_line.product_uom_id
-            line_key = str(move_line.product_id.id) + "_" + name + (description or "") + "uom " + str(uom.id)
+            line_key = str(move_line.product_id.id) + "_" + \
+                name + (description or "") + "uom " + str(uom.id)
 
             if line_key not in aggregated_move_lines:
                 aggregated_move_lines[line_key] = {'name': name,

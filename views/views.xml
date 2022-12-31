@@ -88,6 +88,12 @@
                     <field name="client_reference" string="Votre reference" />
                 </xpath>
 
+                <xpath expr="//field[@name='partner_id']" position="replace">
+                    <field name="partner_id" widget="res_partner_many2one"
+                        context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True, 'restrict_types': 'company'}"
+                        options="{&quot;always_reload&quot;: True,'no_open': True, 'no_create': True}" />
+                </xpath>
+
                 <!-- <xpath expr="//field[@name='date_order'][1]" position="attributes">
                 <attribute
                 name="string">Date de la facturation</attribute>
