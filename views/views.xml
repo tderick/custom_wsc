@@ -1,0 +1,228 @@
+<odoo>
+    <data>
+        <record id="payment_term_view_partner_form" model="ir.ui.view">
+            <field name="name">Payment Term View</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='category_id']" position="after">
+                    <field name="invoice_payment_term_id" placeholder="Payments Terms" />
+                </xpath>
+            </field>
+        </record>
+
+        <!-- <record id="product_template_view_form_inherit_wsc" model="ir.ui.view">
+        <field
+        name="name">product.template.view.form.inherit.wsc</field>
+        <field
+        name="model">product.template</field>
+        <field name="inherit_id"
+        ref="product.product_template_only_form_view" />
+        <field name="arch" type="xml">
+        <xpath expr="//field[@name='barcode']" position="after">
+              <field name="unity"/>
+        </xpath>
+        </field>
+    </record> -->
+
+        <!-- <record id="product_product_view_form_inherit_wsc" model="ir.ui.view">
+        <field
+        name="name">product.product.view.form.inherit.wsc</field>
+        <field
+        name="model">product.product</field>
+        <field name="inherit_id"
+        ref="product.product_normal_form_view" />
+        <field name="arch" type="xml">
+            <xpath
+        expr="//field[@name='barcode']" position="after">
+              <field name="unity"/>
+        </xpath>
+        </field>
+    </record> -->
+
+        <record id="view_order_form_inherit_order_line_wsc" model="ir.ui.view">
+            <field name="name">sale.order.form.order.line.wsc</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']" position="attributes">
+                    <attribute name="domain">[('customer_rank', '!=', 0)]</attribute>
+                </xpath>
+
+                <xpath
+                    expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='name']"
+                    position="after">
+                    <field name="family_name" />
+                </xpath>
+
+                <xpath
+                    expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='name']"
+                    position="after">
+                    <field name="activity_type_name" />
+                </xpath>
+
+                <xpath
+                    expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='product_id']"
+                    position="attributes">
+                    <attribute name="string">Designation WSC</attribute>
+                </xpath>
+
+                <xpath
+                    expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='name']"
+                    position="attributes">
+                    <attribute name="string">Designation</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='client_order_ref']" position="replace">
+                </xpath>
+
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="sale_order_date" string="Date de la commande" />
+                </xpath>
+
+                <xpath expr="//field[@name='sale_order_date']" position="after">
+                    <field name="client_order_ref" string="Bon de commande Client" />
+                </xpath>
+
+                <xpath expr="//field[@name='client_order_ref']" position="after">
+                    <field name="client_reference" string="Votre reference" />
+                </xpath>
+
+                <!-- <xpath expr="//field[@name='date_order'][1]" position="attributes">
+                <attribute
+                name="string">Date de la facturation</attribute>
+            </xpath> 
+
+            <xpath
+                expr="//field[@name='date_order'][2]" position="attributes">
+                <attribute
+                name="string">Date de la facturation</attribute>
+            </xpath> 
+
+            <xpath
+                expr="//label[@for='date_order'][1]" position="replace">    
+            </xpath> -->
+
+                <!-- <xpath
+                expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='price_unit']"
+                position="after">
+                <field name="rate_progress" widget="percentage"
+                attrs="{'invisible': [('activity_type_name', '!=', 'PRESTATIONS')]}"/>
+            </xpath> -->
+            </field>
+        </record>
+
+        <record id="view_move_form_inherit_wsc" model="ir.ui.view">
+            <field name="name">account.move.form.inherit.wsc</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form" />
+            <field name="arch" type="xml">
+
+                <!-- Adding "reception_number" and "sale_order_date" in the main view of accounting -->
+                <xpath expr="//field[@name='invoice_date']" position="after">
+                    <field name="reception_number" />
+                    <field name="sale_order_date" />
+                </xpath>
+
+                <xpath
+                    expr="/form/sheet/notebook/page/field[@name='invoice_line_ids']/tree/field[@name='name']"
+                    position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath
+                    expr="/form/sheet/notebook/page/field[@name='invoice_line_ids']/tree/field[@name='product_id']"
+                    position="after">
+                    <field name="designation_name" string="Designation" />
+                </xpath>
+                <xpath expr="//field[@name='fiscal_position_id']" position="after">
+                    <!-- <field name="reception_number"/>
+                    <field
+                    name="sale_order_date"/> -->
+                    <field name="depot_date" />
+                    <field name="declaration_impots" />
+                    <field name="declaration_date"
+                        attrs="{'invisible': [('declaration_impots', '=', False)]}" />
+                </xpath>
+                <xpath expr="//field[@name='to_check']" position="after">
+                    <field name="acompte" />
+                    <field name="acompte_value" attrs="{'invisible': [('acompte', '=', False)]}" />
+                </xpath>
+
+                <xpath expr="//field[@name='ref']" position="replace">
+                </xpath>
+
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="ref" string="Bon de commande Client" />
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_order_tree_wsc" model="ir.ui.view">
+            <field name="name">sale.order.tree.inherit.wsc</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_tree" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='amount_total']" position="before">
+                    <field name="rate_progress" widget="percentage" />
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_partner_form_wsc_inherit" model="ir.ui.view">
+            <field name="name">res.partner.form.wsc.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='zip']" position="replace">
+                </xpath>
+                <xpath expr="//field[@name='vat']" position="before">
+                    <field name="zip"
+                        attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}" />
+                </xpath>
+                <xpath expr="//field[@name='vat']" position="attributes">
+                    <attribute name="string">NIU</attribute>
+                </xpath>
+                <xpath expr="//field[@name='vat']" position="after">
+                    <field name="others_infos" />
+                </xpath>
+                <!--<xpath expr="//field[@name='siret']" position="replace">
+            </xpath>
+                <xpath expr="//field[@name='vat']" position="after">
+                 <field
+                name="siret"/>
+            </xpath>-->
+            </field>
+        </record>
+
+        <record id="res_partner_form_l10n_fr_wsc_inherit" model="ir.ui.view">
+            <field name="name">res.partner.form.l10n.fr.wsc.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="l10n_fr.res_partner_form_l10n_fr" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='siret']" position="attributes">
+                    <attribute name="string">Registre de commerce</attribute>
+                </xpath>
+                <xpath expr="//field[@name='siret']" position="replace">
+                </xpath>
+                <xpath expr="//field[@name='vat']" position="after">
+                    <field name="siret" string="Registre de commerce" />
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_invoice_tree_wsc" model="ir.ui.view">
+            <field name="name">account.invoice.tree.inherit.wsc</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_invoice_tree" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='invoice_date_due']" position="after">
+                    <field name="depot_date" />
+                    <field name="declaration_impots" />
+                    <field name="declaration_date"
+                        attrs="{'invisible': [('declaration_impots', '=', False)]}" />
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
