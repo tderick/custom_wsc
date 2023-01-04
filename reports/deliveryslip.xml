@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="report_delivery_inherit" inherit_id="stock.report_delivery_document">
+
+
+    </template>
+</odoo>
