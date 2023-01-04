@@ -83,6 +83,20 @@ class SaleOrder(models.Model):
         res = super(SaleOrder, self).create(vals)
         return res
 
+    # def write(self, vals):
+    #     print("--------> ", vals)
+    #     i = 0
+    #     for line in self.order_line:
+    #         print("----> ", vals['order_line'][i][2]["name"])
+    #         product = self.env['product.product'].search(
+    #             [('id', '=', int(line.product_id.id))])
+    #         product.write({
+    #             'description_pickingout': vals['order_line'][i][2]["name"]
+    #         })
+    #         i = i + 1
+    #     super().write(vals)
+    #     return True
+
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
@@ -158,3 +172,9 @@ class StockMoveLine(models.Model):
             else:
                 aggregated_move_lines[line_key]['qty_done'] += move_line.qty_done
         return aggregated_move_lines
+
+
+class StockPicking(models.Model):
+    _inherit = "stock.picking"
+
+    delivery_date_custom = fields.Date(string='Date de livraison', required="True")
