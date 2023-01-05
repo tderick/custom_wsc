@@ -83,20 +83,6 @@ class SaleOrder(models.Model):
         res = super(SaleOrder, self).create(vals)
         return res
 
-    # def write(self, vals):
-    #     print("--------> ", vals)
-    #     i = 0
-    #     for line in self.order_line:
-    #         print("----> ", vals['order_line'][i][2]["name"])
-    #         product = self.env['product.product'].search(
-    #             [('id', '=', int(line.product_id.id))])
-    #         product.write({
-    #             'description_pickingout': vals['order_line'][i][2]["name"]
-    #         })
-    #         i = i + 1
-    #     super().write(vals)
-    #     return True
-
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
@@ -167,8 +153,13 @@ class StockMoveLine(models.Model):
         """
         aggregated_move_lines = {}
         for move_line in self:
-            name = move_line.product_id.description_pickingout
-            description = move_line.move_id.description_picking
+            name = ""
+            if move_line.picking_id.picking_type_code == "outgoing":
+                name = move_line.product_id.description_pickingout
+                description = move_line.move_id.description_picking
+            else:
+                name = move_line.product_id.name
+                description = move_line.move_id.name
             if description == name or description == move_line.product_id.name:
                 description = False
             uom = move_line.product_uom_id
@@ -191,3 +182,9 @@ class StockPicking(models.Model):
     _inherit = "stock.picking"
 
     delivery_date_custom = fields.Date(string='Date de livraison', required="True")
+
+
+class PurchaseOrder(models.Model):
+    _inherit = "purchase.order"
+
+    order_date_custom = fields.Date(string='Date de commande', required="True")
