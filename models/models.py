@@ -8,6 +8,7 @@ class ResPartner(models.Model):
 
     invoice_payment_term_id = fields.Many2one('account.payment.term', string='Payment Terms',
                                               check_company=True)
+    siret = fields.Char('Registre de commerce', size=256)
 
     @api.model
     def _name_search(self, name, args=None, operator="ilike", limit=100, name_get_uid=None):
@@ -44,17 +45,7 @@ class SaleOrderLine(models.Model):
     designation_name = fields.Char(string='Designation')
     unity = fields.Char(string='Unity')
     rate_progress = fields.Float("Rate progress (%)")
-
-
-class AccountMoveLine(models.Model):
-    _inherit = 'account.move.line'
-
-    designation_name = fields.Char(string='Designation')
-    unity = fields.Char(string='Unity')
-
-
-class SaleOrderLine(models.Model):
-    _inherit = 'sale.order.line'
+    name_custom = fields.Text("Designation Client", required=True)
 
     def _prepare_invoice_line(self, **optional_values):
         self.ensure_one()
@@ -64,17 +55,26 @@ class SaleOrderLine(models.Model):
         return res
 
 
+class AccountMoveLine(models.Model):
+    _inherit = 'account.move.line'
+
+    designation_name = fields.Char(string='Designation')
+    unity = fields.Char(string='Unity')
+
+
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     rate_progress = fields.Float("Rate progress (%)")
     client_order_ref = fields.Char("Bon de commande Client", required="True")
     client_reference = fields.Char("Reference Client")
-    sale_order_date = fields.Date(string='Date de la commande')
+    sale_order_date = fields.Date(string='Date de la commande', required=True)
+    infos_client = fields.Char("Autre infos Client")
 
     @api.model
     def create(self, vals):
         for line in vals['order_line']:
+            line[2]["name"] = line[2]["name_custom"]
             product = self.env['product.product'].search(
                 [('id', '=', int(line[2]["product_id"]))])
             product.write({
@@ -126,6 +126,8 @@ class AccountMove(models.Model):
         "Numero Reception", default="RECEPT", required="True")
     acompte = fields.Boolean("Acompte ?")
     acompte_value = fields.Integer("Montant Acompte (FCFA)")
+    infos_client = fields.Char(
+        string='Autre infos Client', compute='_compute_infos_client')
 
     def _compute_sale_order_date(self):
         for account_move in self:
@@ -137,6 +139,17 @@ class AccountMove(models.Model):
                 account_move.sale_order_date = sale_order.sale_order_date
             else:
                 account_move.sale_order_date = ""
+
+    def _compute_infos_client(self):
+        for account_move in self:
+            sale_order_id = account_move.invoice_line_ids.mapped(
+                'sale_line_ids').order_id.id
+            if sale_order_id:
+                sale_order = self.env['sale.order'].search(
+                    [('id', '=', sale_order_id)], limit=1)
+                account_move.infos_client = sale_order.infos_client
+            else:
+                account_move.infos_client = ""
 
 
 class StockMoveLine(models.Model):
