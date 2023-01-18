@@ -65,8 +65,16 @@ class SaleOrderLine(models.Model):
         if 'name_custom' in vals:
             name_custom = vals['name_custom']
 
-            # Update pickingout text
             product = self.product_id
+
+            # Update stock.move
+            for move in self.move_ids:
+                if product == move.product_id:
+                    move.update({
+                        "description_picking": name_custom
+                    })
+
+            # Update pickingout text
             product.update({
                 "description_pickingout": name_custom
             })
@@ -210,3 +218,17 @@ class PurchaseOrder(models.Model):
     _inherit = "purchase.order"
 
     order_date_custom = fields.Date(string='Date de commande', required="True")
+
+
+class StockMoveLine(models.Model):
+    _inherit = "stock.move"
+
+    @api.model
+    def write(self, vals):
+        for line in self:
+            # Update pickingout text
+            product = line.product_id
+            product.update({
+                "description_pickingout": line.description_picking
+            })
+        return super(StockMoveLine, self).write(vals)
