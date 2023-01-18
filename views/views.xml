@@ -11,35 +11,6 @@
             </field>
         </record>
 
-        <!-- <record id="product_template_view_form_inherit_wsc" model="ir.ui.view">
-        <field
-        name="name">product.template.view.form.inherit.wsc</field>
-        <field
-        name="model">product.template</field>
-        <field name="inherit_id"
-        ref="product.product_template_only_form_view" />
-        <field name="arch" type="xml">
-        <xpath expr="//field[@name='barcode']" position="after">
-              <field name="unity"/>
-        </xpath>
-        </field>
-    </record> -->
-
-        <!-- <record id="product_product_view_form_inherit_wsc" model="ir.ui.view">
-        <field
-        name="name">product.product.view.form.inherit.wsc</field>
-        <field
-        name="model">product.product</field>
-        <field name="inherit_id"
-        ref="product.product_normal_form_view" />
-        <field name="arch" type="xml">
-            <xpath
-        expr="//field[@name='barcode']" position="after">
-              <field name="unity"/>
-        </xpath>
-        </field>
-    </record> -->
-
         <record id="view_order_form_inherit_order_line_wsc" model="ir.ui.view">
             <field name="name">sale.order.form.order.line.wsc</field>
             <field name="model">sale.order</field>
@@ -71,6 +42,13 @@
                     expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='name']"
                     position="attributes">
                     <attribute name="string">Designation</attribute>
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath
+                    expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='name']"
+                    position="before">
+                    <field name="name_custom" />
                 </xpath>
 
                 <xpath expr="//field[@name='client_order_ref']" position="replace">
@@ -86,6 +64,10 @@
 
                 <xpath expr="//field[@name='client_order_ref']" position="after">
                     <field name="client_reference" string="Votre reference" />
+                </xpath>
+
+                <xpath expr="//field[@name='payment_term_id']" position="before">
+                    <field name="infos_client" />
                 </xpath>
 
                 <xpath expr="//field[@name='partner_id']" position="replace">
@@ -105,28 +87,6 @@
                         context="{'default_type':'invoice'}"
                         options="{&quot;always_reload&quot;: True,'no_create_edit': True,'no_create': True}" />
                 </xpath>
-
-                <!-- <xpath expr="//field[@name='date_order'][1]" position="attributes">
-                <attribute
-                name="string">Date de la facturation</attribute>
-            </xpath> 
-
-            <xpath
-                expr="//field[@name='date_order'][2]" position="attributes">
-                <attribute
-                name="string">Date de la facturation</attribute>
-            </xpath> 
-
-            <xpath
-                expr="//label[@for='date_order'][1]" position="replace">    
-            </xpath> -->
-
-                <!-- <xpath
-                expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='price_unit']"
-                position="after">
-                <field name="rate_progress" widget="percentage"
-                attrs="{'invisible': [('activity_type_name', '!=', 'PRESTATIONS')]}"/>
-            </xpath> -->
             </field>
         </record>
 
@@ -154,9 +114,6 @@
                     <field name="designation_name" string="Designation" />
                 </xpath>
                 <xpath expr="//field[@name='fiscal_position_id']" position="after">
-                    <!-- <field name="reception_number"/>
-                    <field
-                    name="sale_order_date"/> -->
                     <field name="depot_date" />
                     <field name="declaration_impots" />
                     <field name="declaration_date"
@@ -222,12 +179,6 @@
                 <xpath expr="//field[@name='vat']" position="after">
                     <field name="others_infos" />
                 </xpath>
-                <!--<xpath expr="//field[@name='siret']" position="replace">
-            </xpath>
-                <xpath expr="//field[@name='vat']" position="after">
-                 <field
-                name="siret"/>
-            </xpath>-->
             </field>
         </record>
 
@@ -298,6 +249,32 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='name']" position="replace">
                     <field name="name" attrs="{'invisible': [('name','=','/')],'readonly':False}" />
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_picking_form_wsc" model="ir.ui.view">
+            <field name="name">stock.picking.form.inherit.wsc</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//label[@for='scheduled_date']" position="replace">
+                    <label string="Date de livraison" for="delivery_date_custom" />
+                </xpath>
+                <xpath expr="//field[@name='scheduled_date']" position="replace">
+                    <field name="scheduled_date" invisible="1" />
+                    <field name="delivery_date_custom" />
+                </xpath>
+            </field>
+        </record>
+
+        <record id="purchase_order_form_wsc" model="ir.ui.view">
+            <field name="name">purchase.order.form.inherit.wsc</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='date_order']" position="before">
+                    <field name="order_date_custom" />
                 </xpath>
             </field>
         </record>
