@@ -94,6 +94,7 @@
             <field name="name">account.move.form.inherit.wsc</field>
             <field name="model">account.move</field>
             <field name="inherit_id" ref="account.view_move_form" />
+            <field name="priority">20</field>
             <field name="arch" type="xml">
 
                 <!-- Adding "reception_number" and "sale_order_date" in the main view of accounting -->
@@ -145,6 +146,11 @@
                         options="{'no_create': True}"
                         modifiers="{'invisible':[['move_type','not in',['out_invoice','out_refund','out_receipt']]],'readonly':[['state','not in',['draft']]]}"
                         id="partner_shipping_id" />
+                </xpath>
+
+
+                <xpath expr="//div[hasclass('oe_title')]//field[@name='name']" position="attributes">
+                    <attribute name="attrs">{'readonly': 0}</attribute>
                 </xpath>
 
 
