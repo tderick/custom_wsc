@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import logging
+
 from odoo import models, fields, api
+
+logger = logging.getLogger(__name__)
 
 
 class ResPartner(models.Model):
@@ -53,6 +57,23 @@ class SaleOrderLine(models.Model):
         res['designation_name'] = self.name
         #res['unity'] = self.unity
         return res
+
+    @api.model
+    def write(self, vals):
+        self.ensure_one()
+
+        if 'name_custom' in vals:
+            name_custom = vals['name_custom']
+
+            # Update pickingout text
+            product = self.product_id
+            product.update({
+                "description_pickingout": name_custom
+            })
+
+            # Update sale order line name
+            vals['name'] = name_custom
+        return super(SaleOrderLine, self).write(vals)
 
 
 class AccountMoveLine(models.Model):
@@ -181,7 +202,8 @@ class StockMoveLine(models.Model):
 class StockPicking(models.Model):
     _inherit = "stock.picking"
 
-    delivery_date_custom = fields.Date(string='Date de livraison', required="True")
+    delivery_date_custom = fields.Date(
+        string='Date de livraison', required="True")
 
 
 class PurchaseOrder(models.Model):
